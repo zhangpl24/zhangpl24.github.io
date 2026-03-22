@@ -11,3 +11,7 @@ __pycache__/
 
 # 编辑器与本地 Cursor 配置（不入库）
 .cursor/
+
+# 本地环境变量（若日后使用，勿提交）
+.env
+.env.local

@@ -30,9 +30,18 @@
   --md-typeset-mark-color: rgba(2, 136, 209, 0.22);
 }
 
-/* --- 夜间 slate：深紫相 + 可读链接 ---------------------------------------- */
+/* --- 夜间 slate：深紫相 + 可读链接（整体略提亮，侧栏略深于主栏） ---------- */
 [data-md-color-scheme="slate"] {
   --md-hue: 278;
+  /* 在保持紫相的前提下抬高明度（主题默认约 5% 过黑） */
+  --md-default-bg-color: hsla(var(--md-hue), 15%, 13%, 1);
+  --md-default-bg-color--light: hsla(var(--md-hue), 15%, 13%, 0.58);
+  --md-default-bg-color--lighter: hsla(var(--md-hue), 15%, 13%, 0.32);
+  --md-default-bg-color--lightest: hsla(var(--md-hue), 15%, 13%, 0.12);
+  /* 主内容区略亮于默认底，侧栏略深，形成稳定分隔（不改色相，只调明度层次） */
+  --zen-slate-main-bg: hsla(var(--md-hue), 14%, 15.5%, 1);
+  --zen-slate-sidebar-bg: hsla(var(--md-hue), 16%, 10.5%, 1);
+  --zen-slate-sidebar-border: hsla(var(--md-hue), 18%, 22%, 0.35);
 }
 
 [data-md-color-scheme="slate"][data-md-color-primary="deep-purple"] {
@@ -42,6 +51,18 @@
 [data-md-color-scheme="slate"][data-md-color-accent="purple"] {
   --md-accent-fg-color: #e879f9;
   --md-accent-fg-color--transparent: rgba(232, 121, 249, 0.18);
+}
+
+[data-md-color-scheme="slate"] .md-sidebar--primary .md-sidebar__inner {
+  background-color: var(--zen-slate-sidebar-bg);
+}
+
+[data-md-color-scheme="slate"] .md-main .md-content {
+  background-color: var(--zen-slate-main-bg);
+}
+
+[data-md-color-scheme="slate"] .md-sidebar--primary {
+  border-right-color: var(--zen-slate-sidebar-border);
 }
 
 /* --- 排版：标题衬线（拉丁由 Newsreader 渲染，中文回退到 Noto Sans SC）------ */
@@ -97,24 +118,32 @@
   position: relative;
 }
 
-/* 轻噪点（不参与交互） */
-.md-main::before {
-  content: "";
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  opacity: 0.04;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+/*
+ * 全站纸张质感（同一 SVG 平铺：淡横纹 + 竖纤维感 + 去饱和微粒噪点，昼夜几何一致）
+ * 纹理为灰度，不叠加 mix-blend 改色；浅色为黑墨浓度，深色仅对纹理层 invert，底面色相仍由主题变量决定。
+ */
+body {
+  position: relative;
 }
 
-[data-md-color-scheme="slate"] .md-main::before {
+body::before {
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: -1;
   opacity: 0.055;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Cdefs%3E%3Cfilter id='grain' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch' result='t'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Cpattern id='rules' width='200' height='200' patternUnits='userSpaceOnUse'%3E%3Cpath d='M0 40h200M0 80h200M0 120h200M0 160h200' fill='none' stroke='%23000' stroke-opacity='0.07' stroke-width='0.35'/%3E%3Cpath d='M24 0v200M68 0v200M112 0v200M156 0v200' fill='none' stroke='%23000' stroke-opacity='0.04' stroke-width='0.25'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23rules)'/%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='0.65'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+body[data-md-color-scheme="slate"]::before {
+  opacity: 0.075;
+  filter: invert(1);
 }
 
 .md-content {
   position: relative;
-  z-index: 1;
 }
 
 /* --- 组件：代码块、提示框、表格、引用 -------------------------------------- */
