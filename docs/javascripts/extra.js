@@ -60,16 +60,16 @@
   }
 })();
 
-/* 桌面端：柔和光标拖尾 + 点击彩色星星（Instant 导航下仅绑定一次） */
+/* 桌面端：彩色光标拖尾 + 点击星星（同一按钮开关，localStorage 记忆） */
 (function () {
   if (window.__zenCursorFxInit) return;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   if (!window.matchMedia("(pointer: fine)").matches) return;
 
+  var LS_KEY = "zen-cursor-fx";
   var TRAIL_MAX = 10;
   var TRAIL_WIDTH = 1.55;
   var TRAIL_SHADOW_BLUR = 8;
-  var FADE_OUT = 0.16;
   var STARS_PER_CLICK = 11;
   var MAX_STARS = 160;
   var STAR_GRAVITY = 0.42;
@@ -77,12 +77,59 @@
 
   var canvas = null;
   var ctx = null;
+  var toggleBtn = null;
   var trail = [];
   var stars = [];
   var rafId = 0;
   var pendingMove = null;
   var moveRaf = 0;
   var lastTrailMs = 0;
+  var enabled = true;
+
+  function readEnabled() {
+    try {
+      return localStorage.getItem(LS_KEY) !== "0";
+    } catch (e) {
+      return true;
+    }
+  }
+
+  function writeEnabled(on) {
+    try {
+      if (on) localStorage.removeItem(LS_KEY);
+      else localStorage.setItem(LS_KEY, "0");
+    } catch (e) {
+      /* ignore */
+    }
+  }
+
+  function syncToggleUi() {
+    if (!toggleBtn || !canvas) return;
+    toggleBtn.setAttribute("aria-pressed", enabled ? "true" : "false");
+    toggleBtn.textContent = enabled ? "光标动效：开" : "光标动效：关";
+    canvas.classList.toggle("zen-cursor-fx--off", !enabled);
+  }
+
+  function stopLoop() {
+    if (rafId) {
+      window.cancelAnimationFrame(rafId);
+      rafId = 0;
+    }
+    trail.length = 0;
+    stars.length = 0;
+    if (ctx && canvas) {
+      var dpr = window.devicePixelRatio || 1;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    }
+  }
+
+  function setEnabled(on) {
+    enabled = !!on;
+    writeEnabled(enabled);
+    syncToggleUi();
+    if (!enabled) stopLoop();
+  }
 
   function resize() {
     if (!canvas || !ctx) return;
@@ -157,13 +204,11 @@
 
   function tick() {
     rafId = 0;
-    if (!ctx || !canvas) return;
+    if (!ctx || !canvas || !enabled) return;
 
-    ctx.save();
-    ctx.globalCompositeOperation = "destination-out";
-    ctx.fillStyle = "rgba(0, 0, 0, " + FADE_OUT + ")";
-    ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-    ctx.restore();
+    var dpr = window.devicePixelRatio || 1;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
     var i;
     for (i = stars.length - 1; i >= 0; i--) {
@@ -207,11 +252,12 @@
   }
 
   function onMouseMove(ev) {
+    if (!enabled) return;
     pendingMove = { x: ev.clientX, y: ev.clientY };
     if (moveRaf) return;
     moveRaf = window.requestAnimationFrame(function () {
       moveRaf = 0;
-      if (!pendingMove) return;
+      if (!enabled || !pendingMove) return;
       trail.push(pendingMove);
       lastTrailMs = performance.now();
       if (trail.length > TRAIL_MAX) trail.splice(0, trail.length - TRAIL_MAX);
@@ -220,8 +266,11 @@
     });
   }
 
-  function onClick(ev) {
+  function onDocClick(ev) {
+    if (!enabled) return;
     if (ev.button !== 0 && ev.button !== undefined) return;
+    var t = ev.target;
+    if (toggleBtn && (t === toggleBtn || toggleBtn.contains(t))) return;
     spawnStars(ev.clientX, ev.clientY);
     ensureLoop();
   }
@@ -231,17 +280,31 @@
     if (!document.body) return;
     window.__zenCursorFxInit = true;
 
+    enabled = readEnabled();
+
     canvas = document.createElement("canvas");
     canvas.id = "zen-cursor-fx";
     canvas.setAttribute("aria-hidden", "true");
     ctx = canvas.getContext("2d", { alpha: true });
     document.body.appendChild(canvas);
+
+    toggleBtn = document.createElement("button");
+    toggleBtn.type = "button";
+    toggleBtn.id = "zen-cursor-fx-toggle";
+    toggleBtn.setAttribute("aria-label", "切换光标轨迹与点击星星动效");
+    toggleBtn.addEventListener("click", function () {
+      setEnabled(!enabled);
+    });
+    document.body.appendChild(toggleBtn);
+    syncToggleUi();
+    if (!enabled) stopLoop();
+
     resize();
 
     var passive = { passive: true };
     window.addEventListener("resize", resize, passive);
     document.addEventListener("mousemove", onMouseMove, passive);
-    document.addEventListener("click", onClick, passive);
+    document.addEventListener("click", onDocClick, passive);
   }
 
   if (document.readyState === "loading") {

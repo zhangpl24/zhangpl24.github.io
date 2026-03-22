@@ -420,8 +420,55 @@ html:has(body.zen-motion-hero)::before {
   z-index: 3;
 }
 
+#zen-cursor-fx.zen-cursor-fx--off {
+  visibility: hidden;
+}
+
+#zen-cursor-fx-toggle {
+  position: fixed;
+  right: 0.85rem;
+  bottom: 0.85rem;
+  z-index: 5;
+  margin: 0;
+  padding: 0.35rem 0.65rem;
+  font: inherit;
+  font-size: 0.72rem;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  color: var(--md-default-fg-color--light);
+  background: color-mix(in srgb, var(--md-default-bg-color--light) 88%, transparent);
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 999px;
+  box-shadow: 0 0.06rem 0.25rem rgba(10, 40, 70, 0.08);
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+#zen-cursor-fx-toggle:hover {
+  color: var(--md-typeset-a-color);
+  border-color: color-mix(in srgb, var(--md-typeset-a-color) 35%, transparent);
+}
+
+#zen-cursor-fx-toggle:focus-visible {
+  outline: 2px solid var(--md-accent-fg-color);
+  outline-offset: 2px;
+}
+
+[data-md-color-scheme="slate"] #zen-cursor-fx-toggle {
+  box-shadow: 0 0.1rem 0.4rem rgba(0, 0, 0, 0.35);
+}
+
 @media (prefers-reduced-motion: reduce) {
   #zen-cursor-fx {
+    display: none !important;
+  }
+
+  #zen-cursor-fx-toggle {
     display: none !important;
   }
 }
