@@ -5,9 +5,10 @@ description: zhangpl24 的个人博客首页。
 
 # 欢迎
 
-这里是 **zhangpl24** 的博客，由 [Zensical](https://zensical.org/docs/) 生成并托管在 GitHub Pages。
-
-前往 **[博客文章列表](blog/index.md)** 阅读已发布的文章。站点源码在 GitHub 仓库 [`zhangpl24/zhangpl24.github.io`](https://github.com/zhangpl24/zhangpl24.github.io)。
+<div class="zen-lead" markdown="0">
+  <p>这里是 <strong>zhangpl24</strong> 的博客，由 <a href="https://zensical.org/docs/">Zensical</a> 生成并托管在 GitHub Pages。</p>
+  <p>前往 <a href="blog/"><strong>博客文章列表</strong></a> 阅读已发布的文章。站点源码在 GitHub 仓库 <a href="https://github.com/zhangpl24/zhangpl24.github.io"><code>zhangpl24/zhangpl24.github.io</code></a>。</p>
+</div>
 
 ---
 

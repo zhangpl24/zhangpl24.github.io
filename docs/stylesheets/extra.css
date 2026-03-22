@@ -1,0 +1,282 @@
+/* --------------------------------------------------------------------------
+   zhangpl24 博客：日间浅蓝 · 夜间深紫（Zensical / Material modern）
+   -------------------------------------------------------------------------- */
+
+@import url("https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..800;1,6..72,400..800&display=swap");
+
+/* --- 日间 default：浅蓝层次 ------------------------------------------------ */
+[data-md-color-scheme="default"] {
+  --zen-surface: #e8f3fb;
+  --zen-surface-raised: #f2f8fd;
+  --zen-surface-muted: #d9eaf7;
+  --zen-border: rgba(20, 80, 120, 0.12);
+
+  --md-default-bg-color: var(--zen-surface);
+  --md-default-bg-color--light: #f5faff;
+  --md-default-bg-color--lighter: var(--zen-surface-muted);
+  --md-default-bg-color--lightest: #cfe5f5;
+
+  --md-default-fg-color: rgba(15, 45, 70, 0.92);
+  --md-default-fg-color--light: rgba(25, 60, 88, 0.72);
+  --md-default-fg-color--lighter: rgba(30, 70, 100, 0.48);
+  --md-default-fg-color--lightest: rgba(20, 65, 95, 0.14);
+
+  --md-code-fg-color: #1a3a52;
+  --md-code-bg-color: #dceef9;
+  --md-code-bg-color--light: #d0e8f6;
+  --md-code-bg-color--lighter: rgba(12, 90, 140, 0.12);
+
+  --md-typeset-a-color: #0277bd;
+  --md-typeset-mark-color: rgba(2, 136, 209, 0.22);
+}
+
+/* --- 夜间 slate：深紫相 + 可读链接 ---------------------------------------- */
+[data-md-color-scheme="slate"] {
+  --md-hue: 278;
+}
+
+[data-md-color-scheme="slate"][data-md-color-primary="deep-purple"] {
+  --md-typeset-a-color: #c4a7ff;
+}
+
+[data-md-color-scheme="slate"][data-md-color-accent="purple"] {
+  --md-accent-fg-color: #e879f9;
+  --md-accent-fg-color--transparent: rgba(232, 121, 249, 0.18);
+}
+
+/* --- 排版：标题衬线（拉丁由 Newsreader 渲染，中文回退到 Noto Sans SC）------ */
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3 {
+  font-family: "Newsreader", "Noto Sans SC", serif;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.md-typeset {
+  font-size: 0.95rem;
+  line-height: 1.72;
+}
+
+.md-typeset a:not(.md-button):not(.zen-post-card) {
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--md-typeset-a-color) 35%, transparent);
+  text-underline-offset: 0.2em;
+  transition:
+    color 0.2s ease,
+    text-decoration-color 0.2s ease;
+}
+
+.md-typeset a:not(.md-button):not(.zen-post-card):hover {
+  text-decoration-color: var(--md-typeset-a-color);
+}
+
+/* --- 壳层：顶栏、侧栏、主栏 ------------------------------------------------ */
+.md-header {
+  box-shadow:
+    0 0.05rem 0 var(--zen-border, rgba(0, 0, 0, 0.06)),
+    0 0.15rem 0.6rem rgba(15, 50, 80, 0.06);
+}
+
+[data-md-color-scheme="slate"] .md-header {
+  box-shadow:
+    0 0.05rem 0 rgba(200, 180, 255, 0.08),
+    0 0.2rem 0.8rem rgba(0, 0, 0, 0.35);
+}
+
+.md-sidebar--primary {
+  border-right: 1px solid var(--zen-border, var(--md-default-fg-color--lightest));
+}
+
+.md-nav__link--active {
+  font-weight: 600;
+}
+
+.md-main {
+  position: relative;
+}
+
+/* 轻噪点（不参与交互） */
+.md-main::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+[data-md-color-scheme="slate"] .md-main::before {
+  opacity: 0.055;
+}
+
+.md-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* --- 组件：代码块、提示框、表格、引用 -------------------------------------- */
+.md-typeset pre {
+  border-radius: 0.45rem;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  box-shadow: 0 0.1rem 0.35rem rgba(10, 40, 70, 0.06);
+}
+
+[data-md-color-scheme="slate"] .md-typeset pre {
+  border-color: rgba(200, 180, 255, 0.12);
+  box-shadow: 0 0.2rem 0.6rem rgba(0, 0, 0, 0.25);
+}
+
+.md-typeset .admonition {
+  border-radius: 0.45rem;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  box-shadow: 0 0.08rem 0.3rem rgba(10, 40, 70, 0.05);
+  transition:
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset .admonition:hover {
+    box-shadow: 0 0.2rem 0.55rem rgba(10, 40, 70, 0.1);
+    transform: translateY(-1px);
+  }
+
+  [data-md-color-scheme="slate"] .md-typeset .admonition:hover {
+    box-shadow: 0 0.25rem 0.7rem rgba(0, 0, 0, 0.35);
+  }
+}
+
+.md-typeset blockquote {
+  border-left-width: 0.22rem;
+  border-radius: 0 0.35rem 0.35rem 0;
+  background-color: var(--md-default-bg-color--lighter);
+}
+
+.md-typeset table:not([class]) {
+  border-radius: 0.4rem;
+  overflow: hidden;
+  box-shadow: 0 0.06rem 0.25rem rgba(10, 40, 70, 0.06);
+}
+
+/* --- 文章列表卡片 ---------------------------------------------------------- */
+.zen-post-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  max-width: 40rem;
+}
+
+.zen-post-card {
+  display: block;
+  padding: 1.15rem 1.35rem;
+  border-radius: 0.5rem;
+  text-decoration: none !important;
+  color: inherit !important;
+  background: var(--md-default-bg-color--light);
+  border: 1px solid var(--md-default-fg-color--lightest);
+  box-shadow: 0 0.08rem 0.35rem rgba(10, 50, 80, 0.06);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+.zen-post-card:hover {
+  border-color: color-mix(in srgb, var(--md-typeset-a-color) 45%, transparent);
+  box-shadow: 0 0.2rem 0.65rem rgba(10, 60, 100, 0.12);
+}
+
+.zen-post-card__title {
+  display: block;
+  font-family: "Newsreader", "Noto Sans SC", serif;
+  font-size: 1.2rem;
+  font-weight: 650;
+  color: var(--md-typeset-color, var(--md-default-fg-color));
+  margin-bottom: 0.35rem;
+}
+
+.zen-post-card__meta {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--md-default-fg-color--light);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .zen-post-card:hover {
+    transform: translateY(-3px);
+  }
+}
+
+[data-md-color-scheme="slate"] .zen-post-card {
+  box-shadow: 0 0.12rem 0.45rem rgba(0, 0, 0, 0.28);
+}
+
+[data-md-color-scheme="slate"] .zen-post-card:hover {
+  box-shadow: 0 0.25rem 0.85rem rgba(0, 0, 0, 0.45);
+}
+
+/* 首页扉页式导语 */
+.zen-lead {
+  font-size: 1.05rem;
+  color: var(--md-default-fg-color--light);
+  max-width: 42rem;
+  padding: 0.75rem 0 0.25rem;
+  margin: 0 0 1rem !important;
+  border-left: 3px solid color-mix(in srgb, var(--md-typeset-a-color) 55%, transparent);
+  padding-left: 1rem;
+}
+
+.zen-lead p {
+  margin: 0.4em 0;
+}
+
+.zen-lead p:first-child {
+  margin-top: 0;
+}
+
+.zen-lead p:last-child {
+  margin-bottom: 0;
+}
+
+/* --- Instant 导航：主内容入场 ---------------------------------------------- */
+@keyframes zen-content-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.55rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+article.md-content__inner.zen-content-enter {
+  animation: zen-content-enter 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  article.md-content__inner.zen-content-enter {
+    animation: none !important;
+  }
+
+  .md-typeset .admonition {
+    transition: none;
+  }
+
+  .md-typeset .admonition:hover {
+    transform: none;
+  }
+
+  .zen-post-card {
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .zen-post-card:hover {
+    transform: none;
+  }
+}
