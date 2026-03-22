@@ -59,3 +59,194 @@
     onDocumentUpdate();
   }
 })();
+
+/* 桌面端：柔和光标拖尾 + 点击彩色星星（Instant 导航下仅绑定一次） */
+(function () {
+  if (window.__zenCursorFxInit) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if (!window.matchMedia("(pointer: fine)").matches) return;
+
+  var TRAIL_MAX = 10;
+  var TRAIL_WIDTH = 1.55;
+  var TRAIL_SHADOW_BLUR = 8;
+  var FADE_OUT = 0.16;
+  var STARS_PER_CLICK = 11;
+  var MAX_STARS = 160;
+  var STAR_GRAVITY = 0.42;
+  var STAR_FRICTION = 0.985;
+
+  var canvas = null;
+  var ctx = null;
+  var trail = [];
+  var stars = [];
+  var rafId = 0;
+  var pendingMove = null;
+  var moveRaf = 0;
+  var lastTrailMs = 0;
+
+  function resize() {
+    if (!canvas || !ctx) return;
+    var dpr = window.devicePixelRatio || 1;
+    var w = window.innerWidth;
+    var h = window.innerHeight;
+    canvas.width = Math.max(1, Math.floor(w * dpr));
+    canvas.height = Math.max(1, Math.floor(h * dpr));
+    canvas.style.width = w + "px";
+    canvas.style.height = h + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function drawTrail() {
+    if (trail.length < 2) return;
+    var n = trail.length;
+    var hueBase = performance.now() * 0.022;
+    ctx.save();
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.lineWidth = TRAIL_WIDTH;
+    for (var i = 1; i < n; i++) {
+      var hue = (hueBase + i * 36) % 360;
+      var segA = 0.055 + (i / (n - 1)) * 0.11;
+      var stroke = "hsla(" + hue + ", 52%, 62%, " + segA + ")";
+      ctx.strokeStyle = stroke;
+      ctx.shadowBlur = TRAIL_SHADOW_BLUR;
+      ctx.shadowColor = "hsla(" + hue + ", 52%, 62%, " + (segA * 0.75) + ")";
+      ctx.beginPath();
+      ctx.moveTo(trail[i - 1].x, trail[i - 1].y);
+      ctx.lineTo(trail[i].x, trail[i].y);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function drawStarPath(x, y, outerR, innerR, rotation) {
+    var spikes = 5;
+    var step = Math.PI / spikes;
+    var rot = -Math.PI / 2 + rotation;
+    ctx.beginPath();
+    for (var i = 0; i < spikes * 2; i++) {
+      var rad = i % 2 === 0 ? outerR : innerR;
+      var px = x + Math.cos(rot) * rad;
+      var py = y + Math.sin(rot) * rad;
+      if (i === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+      rot += step;
+    }
+    ctx.closePath();
+  }
+
+  function spawnStars(clientX, clientY) {
+    var room = MAX_STARS - stars.length;
+    if (room <= 0) return;
+    var n = Math.min(STARS_PER_CLICK, room);
+    for (var i = 0; i < n; i++) {
+      stars.push({
+        x: clientX,
+        y: clientY,
+        vx: (Math.random() - 0.5) * 6.5,
+        vy: -Math.random() * 7.2 - 2.2,
+        hue: Math.floor(Math.random() * 360),
+        life: 1,
+        lifeDecay: 0.012 + Math.random() * 0.018,
+        outer: 3.2 + Math.random() * 3.8,
+        rotation: Math.random() * Math.PI * 2,
+        spin: (Math.random() - 0.5) * 0.35,
+      });
+    }
+  }
+
+  function tick() {
+    rafId = 0;
+    if (!ctx || !canvas) return;
+
+    ctx.save();
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.fillStyle = "rgba(0, 0, 0, " + FADE_OUT + ")";
+    ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+    ctx.restore();
+
+    var i;
+    for (i = stars.length - 1; i >= 0; i--) {
+      var s = stars[i];
+      s.vy += STAR_GRAVITY;
+      s.vx *= STAR_FRICTION;
+      s.vy *= STAR_FRICTION;
+      s.x += s.vx;
+      s.y += s.vy;
+      s.rotation += s.spin;
+      s.life -= s.lifeDecay;
+      if (s.life <= 0 || s.y > window.innerHeight + s.outer * 2) {
+        stars.splice(i, 1);
+        continue;
+      }
+      var inner = s.outer * 0.42;
+      var alpha = Math.max(0, Math.min(1, s.life));
+      ctx.save();
+      ctx.fillStyle = "hsla(" + s.hue + ", 78%, 62%, " + (alpha * 0.92) + ")";
+      ctx.strokeStyle = "hsla(" + s.hue + ", 85%, 72%, " + (alpha * 0.55) + ")";
+      ctx.lineWidth = 0.6;
+      drawStarPath(s.x, s.y, s.outer, inner, s.rotation);
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    drawTrail();
+
+    if (trail.length > 0) {
+      if (performance.now() - lastTrailMs > 34) trail.shift();
+    }
+
+    if (trail.length > 0 || stars.length > 0) {
+      rafId = window.requestAnimationFrame(tick);
+    }
+  }
+
+  function ensureLoop() {
+    if (!rafId) rafId = window.requestAnimationFrame(tick);
+  }
+
+  function onMouseMove(ev) {
+    pendingMove = { x: ev.clientX, y: ev.clientY };
+    if (moveRaf) return;
+    moveRaf = window.requestAnimationFrame(function () {
+      moveRaf = 0;
+      if (!pendingMove) return;
+      trail.push(pendingMove);
+      lastTrailMs = performance.now();
+      if (trail.length > TRAIL_MAX) trail.splice(0, trail.length - TRAIL_MAX);
+      pendingMove = null;
+      ensureLoop();
+    });
+  }
+
+  function onClick(ev) {
+    if (ev.button !== 0 && ev.button !== undefined) return;
+    spawnStars(ev.clientX, ev.clientY);
+    ensureLoop();
+  }
+
+  function boot() {
+    if (window.__zenCursorFxInit) return;
+    if (!document.body) return;
+    window.__zenCursorFxInit = true;
+
+    canvas = document.createElement("canvas");
+    canvas.id = "zen-cursor-fx";
+    canvas.setAttribute("aria-hidden", "true");
+    ctx = canvas.getContext("2d", { alpha: true });
+    document.body.appendChild(canvas);
+    resize();
+
+    var passive = { passive: true };
+    window.addEventListener("resize", resize, passive);
+    document.addEventListener("mousemove", onMouseMove, passive);
+    document.addEventListener("click", onClick, passive);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+})();
