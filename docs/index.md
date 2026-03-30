@@ -6,7 +6,7 @@ description: zhangpl24 的个人介绍与主页。
 # 个人介绍
 
 <div class="zen-lead" markdown="0">
-  <p>你好，我是 <strong> zhangpl23</strong>, 是清华大学计算机系24级的一名本科生。这里是我在 GitHub Pages 上的个人站点。
+  <p>你好，我是 <strong>zhangpl24</strong>，清华大学计算机系 24 级本科生。这里是我在 GitHub Pages 上的个人站点。</p>
   <p>想读文章请前往 <a href="blog/"><strong>博客文章列表</strong></a>。站点源码：<a href="https://github.com/zhangpl24/zhangpl24.github.io"><code>zhangpl24/zhangpl24.github.io</code></a>。</p>
 </div>
 
@@ -14,13 +14,21 @@ description: zhangpl24 的个人介绍与主页。
 
 ## 关于我
 
-资深（并非）旮旯玩家，喜欢MC，这段时间染上了爬塔。目前感兴趣的方向主要是大模型。
+- 资深（并非）旮旯玩家，喜欢 MC，这段时间染上了爬塔。目前感兴趣的方向主要是大模型。
+
+---
+
+## 技能与兴趣
+
+- MC
+- 爬塔
+- 大模型
 ---
 
 
 ## 项目与链接
 
-目前还没有
+目前还没有（后续会把作品/开源项目整理在这里）。
 
 ---
 
