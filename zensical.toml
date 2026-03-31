@@ -54,7 +54,6 @@ nav = [
   { "编译原理" = "编译原理/index.md" },
   { "工具" = "tools/index.md" },
   { "博客" = "blog/index.md" },
-  { "Markdown 速查" = "markdown.md" },
 ]
 
 # With the "extra_css" option you can add your own CSS styling to customize

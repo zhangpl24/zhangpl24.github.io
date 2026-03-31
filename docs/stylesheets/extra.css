@@ -133,6 +133,7 @@ body::before {
   inset: 0;
   z-index: -1;
   opacity: 0.055;
+  background-position: 0 0;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Cdefs%3E%3Cfilter id='grain' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch' result='t'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Cpattern id='rules' width='200' height='200' patternUnits='userSpaceOnUse'%3E%3Cpath d='M0 40h200M0 80h200M0 120h200M0 160h200' fill='none' stroke='%23000' stroke-opacity='0.07' stroke-width='0.35'/%3E%3Cpath d='M24 0v200M68 0v200M112 0v200M156 0v200' fill='none' stroke='%23000' stroke-opacity='0.04' stroke-width='0.25'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23rules)'/%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='0.65'/%3E%3C/svg%3E");
   background-repeat: repeat;
 }
@@ -306,104 +307,6 @@ article.md-content__inner.zen-content-enter {
   }
 
   .zen-post-card:hover {
-    transform: none;
-  }
-}
-
-/* --------------------------------------------------------------------------
-   全站英雄动效（body.zen-motion-hero 由 extra.js 每次文档更新时挂载）
-   仅追加：aurora 底层 + 视差变量 --zen-hero-parallax + 编排入场
-   -------------------------------------------------------------------------- */
-
-html:has(body.zen-motion-hero)::before {
-  content: "";
-  pointer-events: none;
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  opacity: 0.5;
-  transform: translate3d(0, var(--zen-hero-parallax, 0px), 0);
-  background:
-    radial-gradient(ellipse 85% 55% at 15% 25%, color-mix(in srgb, var(--md-typeset-a-color) 28%, transparent) 0%, transparent 58%),
-    radial-gradient(ellipse 75% 50% at 88% 72%, color-mix(in srgb, var(--md-accent-fg-color) 22%, transparent) 0%, transparent 55%),
-    radial-gradient(ellipse 65% 45% at 50% 105%, color-mix(in srgb, var(--md-typeset-a-color) 15%, transparent) 0%, transparent 50%);
-  animation: zen-hero-aurora-pulse 16s ease-in-out infinite alternate;
-}
-
-@keyframes zen-hero-aurora-pulse {
-  from {
-    opacity: 0.38;
-  }
-
-  to {
-    opacity: 0.62;
-  }
-}
-
-@keyframes zen-hero-reveal {
-  from {
-    opacity: 0;
-    transform: translateY(0.7rem);
-  }
-
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  body.zen-motion-hero .md-typeset > h1:first-of-type {
-    animation: zen-hero-reveal 0.78s cubic-bezier(0.22, 1, 0.36, 1) both;
-    animation-delay: 0.05s;
-  }
-
-  body.zen-motion-hero .zen-lead {
-    animation: zen-hero-reveal 0.78s cubic-bezier(0.22, 1, 0.36, 1) both;
-    animation-delay: 0.14s;
-  }
-
-  body.zen-motion-hero .zen-post-list .zen-post-card {
-    animation: zen-hero-reveal 0.72s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
-
-  body.zen-motion-hero .zen-post-list .zen-post-card:nth-child(1) {
-    animation-delay: 0.22s;
-  }
-
-  body.zen-motion-hero .zen-post-list .zen-post-card:nth-child(2) {
-    animation-delay: 0.3s;
-  }
-
-  body.zen-motion-hero .zen-post-list .zen-post-card:nth-child(3) {
-    animation-delay: 0.38s;
-  }
-
-  body.zen-motion-hero .zen-post-list .zen-post-card:nth-child(4) {
-    animation-delay: 0.46s;
-  }
-
-  body.zen-motion-hero .zen-post-list .zen-post-card:nth-child(5) {
-    animation-delay: 0.54s;
-  }
-
-  body.zen-motion-hero .zen-post-list .zen-post-card:nth-child(n + 6) {
-    animation-delay: 0.62s;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html:has(body.zen-motion-hero)::before {
-    animation: none !important;
-    opacity: 0.42;
-    transform: none !important;
-  }
-
-  body.zen-motion-hero .md-typeset > h1:first-of-type,
-  body.zen-motion-hero .zen-lead,
-  body.zen-motion-hero .zen-post-list .zen-post-card {
-    animation: none !important;
-    opacity: 1;
     transform: none;
   }
 }

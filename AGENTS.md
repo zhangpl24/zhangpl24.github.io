@@ -20,7 +20,7 @@
 | `docs/blog/` | 博客短文、随笔等（非课程类）；`docs/blog/index.md` 为列表页。 |
 | `docs/<主题>/` | 按主题分目录的笔记（如 `docs/hpc/` 对应高性能计算课程），各目录内可有 `index.md` 作索引。 |
 | `docs/assets/` | 图片等静态资源（按主题分子目录，如 `docs/assets/hpc/`）。 |
-| `docs/*.md` | 根目录独立页面（如 `markdown.md` 速查）。 |
+| `docs/*.md` | 根目录独立页面（可选）。 |
 | `site/` | **构建输出**（`zensical build` 生成）。已列入 `.gitignore`，一般不入库；CI 在干净环境中生成并上传。 |
 | `.github/workflows/docs.yml` | GitHub Actions：推送 `main`/`master` 时安装 Zensical、构建、部署到 GitHub Pages。 |
 | `.venv/` | 本地 Python 虚拟环境（已忽略）。 |
