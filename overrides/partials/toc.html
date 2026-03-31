@@ -1,0 +1,25 @@
+{#-
+  基于 Zensical 内置 partials/toc.html，仅去掉「首个 TOC 为 level 1 时剥壳」逻辑，
+  使右侧栏显示完整标题树（含正文中的第一个一级标题）。
+
+  页面主标题请在 frontmatter 中使用 title 字段，与正文第一个 # 区分。
+-#}
+{% import "partials/language.html" as lang with context %}
+{% set title = lang.t("toc") %}
+{% if config.mdx_configs.toc and config.mdx_configs.toc.title %}
+  {% set title = config.mdx_configs.toc.title %}
+{% endif %}
+<nav class="md-nav md-nav--secondary" aria-label="{{ title | e }}">
+  {% set toc = page.toc %}
+  {% if toc %}
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      {{ title }}
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      {% for toc_item in toc %}
+        {% include "partials/toc-item.html" %}
+      {% endfor %}
+    </ul>
+  {% endif %}
+</nav>

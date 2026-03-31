@@ -463,6 +463,52 @@ html:has(body.zen-motion-hero)::before {
   box-shadow: 0 0.1rem 0.4rem rgba(0, 0, 0, 0.35);
 }
 
+/* 左下角：返回上一页（与右下角光标开关错开） */
+#zen-back-btn.zen-back-btn {
+  position: fixed;
+  left: 0.85rem;
+  bottom: 0.85rem;
+  z-index: 5;
+  margin: 0;
+  padding: 0.4rem 0.85rem;
+  font: inherit;
+  font-size: 0.82rem;
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+  color: var(--md-default-fg-color);
+  background: color-mix(in srgb, var(--md-default-bg-color--light) 88%, transparent);
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 999px;
+  box-shadow: 0 0.06rem 0.25rem rgba(10, 40, 70, 0.08);
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+#zen-back-btn.zen-back-btn:hover {
+  color: var(--md-typeset-a-color);
+  border-color: color-mix(in srgb, var(--md-typeset-a-color) 35%, transparent);
+  box-shadow: 0 0.12rem 0.45rem rgba(10, 50, 80, 0.12);
+}
+
+#zen-back-btn.zen-back-btn:focus-visible {
+  outline: 2px solid var(--md-accent-fg-color);
+  outline-offset: 2px;
+}
+
+[data-md-color-scheme="slate"] #zen-back-btn.zen-back-btn {
+  box-shadow: 0 0.1rem 0.4rem rgba(0, 0, 0, 0.35);
+}
+
+[data-md-color-scheme="slate"] #zen-back-btn.zen-back-btn:hover {
+  box-shadow: 0 0.15rem 0.55rem rgba(0, 0, 0, 0.45);
+}
+
 @media (prefers-reduced-motion: reduce) {
   #zen-cursor-fx {
     display: none !important;

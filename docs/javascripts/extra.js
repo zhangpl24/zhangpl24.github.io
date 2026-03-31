@@ -313,3 +313,43 @@
     boot();
   }
 })();
+
+/* 固定「返回上一页」：与 instant 导航兼容，无历史时回站点首页 */
+(function () {
+  function goBack() {
+    var ref = document.referrer;
+    var sameOrigin = false;
+    try {
+      sameOrigin = ref && new URL(ref).origin === window.location.origin;
+    } catch (e) {
+      /* ignore */
+    }
+    if (window.history.length > 1 || sameOrigin) {
+      window.history.back();
+    } else {
+      window.location.assign("/");
+    }
+  }
+
+  function initBackButton() {
+    if (document.getElementById("zen-back-btn")) return;
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.id = "zen-back-btn";
+    btn.className = "zen-back-btn";
+    btn.setAttribute("aria-label", "返回上一页");
+    btn.setAttribute("title", "返回上一页");
+    btn.textContent = "返回";
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      goBack();
+    });
+    document.body.appendChild(btn);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initBackButton);
+  } else {
+    initBackButton();
+  }
+})();

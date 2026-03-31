@@ -17,19 +17,20 @@
 | `zensical.toml` | 站点元数据、导航 `nav`、主题、功能开关等**唯一主配置**。新增顶栏/侧栏入口通常要改这里。 |
 | `docs/` | **源内容目录**（Markdown 等）。构建时以此为 `docs_dir`。 |
 | `docs/index.md` | 首页。 |
-| `docs/blog/` | 博客文章与列表页。 |
-| `docs/blog/index.md` | 文章列表（需手动维护指向各文章的链接，或与 `nav` 配合）。 |
-| `docs/*.md` | 其他独立页面（如 `markdown.md` 速查）。 |
+| `docs/blog/` | 博客短文、随笔等（非课程类）；`docs/blog/index.md` 为列表页。 |
+| `docs/<主题>/` | 按主题分目录的笔记（如 `docs/hpc/` 对应高性能计算课程），各目录内可有 `index.md` 作索引。 |
+| `docs/assets/` | 图片等静态资源（按主题分子目录，如 `docs/assets/hpc/`）。 |
+| `docs/*.md` | 根目录独立页面（如 `markdown.md` 速查）。 |
 | `site/` | **构建输出**（`zensical build` 生成）。已列入 `.gitignore`，一般不入库；CI 在干净环境中生成并上传。 |
 | `.github/workflows/docs.yml` | GitHub Actions：推送 `main`/`master` 时安装 Zensical、构建、部署到 GitHub Pages。 |
 | `.venv/` | 本地 Python 虚拟环境（已忽略）。 |
 
-## 发布新文章的典型流程
+## 发布新内容的典型流程
 
-1. 在 `docs/blog/` 下新建 `文章 slug.md`。
-2. 文件开头使用 YAML frontmatter（与现有文章一致），常用字段：`date`、`icon`、`description`。
-3. 在 `docs/blog/index.md` 的列表中增加一条链接（项目当前采用手动列表）。
-4. 若希望侧栏/顶栏出现固定入口，在 `zensical.toml` 的 `nav` 数组里增加对应项（路径相对 `docs/`，如 `blog/new-post.md`）。
+1. **课程/主题笔记**：在对应的 `docs/<主题>/` 下新建 `.md`（例如 `docs/hpc/`），并在该主题的 `index.md` 中增加链接；侧栏 `nav` 中通常**只挂该主题的 `index.md`**，不把每篇笔记单独列在导航里。若为新主题，新建 `docs/<主题>/index.md` 并在 `zensical.toml` 的 `nav` 中增加一条指向该 `index.md` 的入口。
+2. **博客短文**（非课程）：在 `docs/blog/` 下新建文章，并更新 `docs/blog/index.md`。
+3. 文件开头使用 YAML frontmatter（与现有文章一致），常用字段：`date`、`icon`、`description`。
+4. 图片等资源放在 `docs/assets/`（或主题子目录）下，正文中使用相对 `docs/` 的路径。
 5. 本地预览：`zensical serve`；提交并推送后由 Actions 构建部署。
 
 ## 本地开发命令
