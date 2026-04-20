@@ -52,6 +52,7 @@ nav = [
   { "首页" = "index.md" },
   { "高性能计算" = "hpc/index.md" },
   { "编译原理" = "编译原理/index.md" },
+  { "概率统计" = "概统/index.md" },
   { "工具" = "tools/index.md" },
   { "博客" = "blog/index.md" },
 ]
