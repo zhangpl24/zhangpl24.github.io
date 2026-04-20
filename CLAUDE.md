@@ -25,13 +25,36 @@ The site has **two parallel structures** that must stay in sync:
 1. **Filesystem** — topic folders under `docs/` (e.g. `docs/hpc/`, `docs/编译原理/`, `docs/tools/`, `docs/blog/`). Each topic folder has its own `index.md` that lists the notes inside it.
 2. **Sidebar `nav`** in `zensical.toml` — only references each topic's `index.md`, never individual notes. Individual posts are discovered via the topic's `index.md` list page, not the sidebar.
 
-So adding a new note is **two edits**: the `.md` file itself, plus a link entry in the topic's `index.md`. Only when creating a *new topic* do you touch `zensical.toml`'s `nav`.
+So adding a new note is **two edits**: the `.md` file itself, plus a link entry in the topic's `index.md`. Creating a *new topic* is **four**: `docs/<topic>/` folder + `docs/<topic>/index.md` (list page) + the note + a `nav` entry in `zensical.toml` (insert in display order, not alphabetic). Topic folders with Chinese names work (e.g. `docs/编译原理/`, `docs/概统/`).
 
 Non-course short-form writing goes in `docs/blog/` (update `docs/blog/index.md`). Course/topic notes go in `docs/<topic>/`.
 
 ## Frontmatter convention
 
-Match existing posts — typical fields are `date` (`YYYY-MM-DD`), `icon` (e.g. `lucide/...`), `description`. Assets live under `docs/assets/<topic>/` and are referenced with paths relative to `docs/`.
+Match existing posts — typical fields are `date` (`YYYY-MM-DD`), `icon` (e.g. `lucide/...`), `description`. Assets live under `docs/assets/<topic>/` and are referenced with paths relative to `docs/`. Asset filenames should be ASCII-friendly (e.g. `hpc-3-00.webp`, `pasted-20260305101645.png`, `hanshufenbu-04.png`) — do **not** keep Obsidian's `第八讲函数分布 4.png`-style names with spaces/CJK, as they hurt URLs and diff readability.
+
+## Admonitions (callouts)
+
+Use Material-style admonitions — **not** `> **bold**` blockquotes — for note/tip/warning/example boxes:
+
+```
+!!! abstract "定理（...）"
+
+    正文必须缩进 4 空格，前后各一空行。
+
+??? note "证明"           # collapsed by default
+???+ example "例"         # expanded by default, user can collapse
+```
+
+Valid types: `note`, `abstract`, `tip`, `info`, `success`, `question`, `warning`, `failure`, `danger`, `example`, `quote`. CSS hooks already exist in `docs/stylesheets/extra.css` (`.md-typeset .admonition`).
+
+## Math (MathJax)
+
+**There is no site-wide math config.** Any page that uses `$...$` / `$$...$$` must inject MathJax itself — via a `<script>` block at the top of the `.md` file (under the frontmatter). See `docs/概统/函数分布.md` for the canonical pattern. Requirements:
+
+- Configure `MathJax.tex.inlineMath`/`displayMath` to accept both `$...$` and `\(...\)`.
+- Hook `document$.subscribe(typeset)` — Zensical has `navigation.instant` enabled, so without this math only renders on first load and breaks after any in-site navigation.
+- Set `ignoreHtmlClass: "no-mathjax"` to keep MathJax out of code blocks.
 
 ## Theme overrides
 
@@ -39,13 +62,36 @@ Match existing posts — typical fields are `date` (`YYYY-MM-DD`), `icon` (e.g. 
 
 ## Importing from Obsidian (`~/Documents/Obsidian Vault`)
 
-When the task is "import/sync a note from my Obsidian vault", per `.cursor/rules/obsidian-notes-upload.mdc`:
+Use `scripts/obsidian_import.py` for the mechanical transforms (frontmatter strip, attachment rename+copy, wikilink/callout rewrite, MathJax injection). Unit tests live alongside it: `python3 scripts/test_obsidian_import.py`.
 
-- **Report first**: before writing to `docs/`, list the source `.md` filename(s) and attachment paths you're pulling from, so the user can confirm you found the right files.
-- **Mirror the topic folder**: vault `course/hpc/foo.md` → `docs/hpc/foo.md`. Do not dump course notes into `docs/blog/`.
-- **Rewrite Obsidian-specific syntax** (do not paste raw):
-  - `[[wikilinks]]` → standard Markdown links or bold text
-  - `![[embeds]]` → standard `![](...)` with the asset copied into `docs/assets/...`
-  - `> [!note]` callouts → plain `>` blockquotes or heading + paragraph
-  - Drop `tags`/`aliases`/`cssclasses` frontmatter; keep/synthesize `date`/`icon`/`description`.
-- **Copy assets into the repo** — never link to `~/Documents/...` absolute paths (static site can't resolve them).
+```bash
+# A whole topic folder
+python3 scripts/obsidian_import.py \
+    "$HOME/Documents/Obsidian Vault/course/<topic>" <Topic> -v
+
+# A single note
+python3 scripts/obsidian_import.py \
+    "$HOME/Documents/Obsidian Vault/course/<topic>/<note>.md" <Topic> -v
+
+# Preview without writing / copying
+python3 scripts/obsidian_import.py <source> <Topic> --dry-run
+```
+
+`<Topic>` is the folder under `docs/` (e.g. `Machine-Learning`, `hpc`). Assets land in `docs/assets/<slug-of-topic>/` with slugified ASCII filenames. Re-import with `--force` to overwrite (manual frontmatter edits will be lost — apply them to the vault source, or re-do after import).
+
+**Before running** (per `.cursor/rules/obsidian-notes-upload.mdc`): **report first** — list the source `.md` file(s) and confirm with the user before writing. `--dry-run` is the natural way to do this.
+
+**After running** — four steps the script intentionally does NOT automate:
+
+1. Add `icon:` / `description:` (and `date:` if the source lacked one) to each new file's frontmatter.
+2. Create/update `docs/<Topic>/index.md` with zen-post-card entries (pattern: `docs/概统/index.md`).
+3. For a **new topic**, add a `nav` entry in `zensical.toml` — insert in display order, not alphabetic: `{ "<显示名>" = "<Topic>/index.md" }`.
+4. Verify with `zensical build --clean` (or `serve`).
+
+**What the script transforms** (reference — the sections above are authoritative):
+
+- Frontmatter: drops `tags` / `aliases` / `cssclasses`; moves `title:` into an H1; keeps `date:`.
+- `![[Attachment/X|n]]` → `![stem](../assets/<topic-slug>/<slug>.ext)`; drops `|width`; copies and renames the asset.
+- `[[Note]]` / `[[Note|Display]]` → `[Display](../Note/)` (URL-encoded); `[[foo.pdf#page=2|Text]]` → plain `Text`.
+- `> [!type](+/-)? 标题` → `!!! / ???+ / ??? <type> "标题"`, body indented 4 spaces.
+- When `$...$` or `$$...$$` appears outside code, injects the MathJax `<script>` block (see **Math** section above).
